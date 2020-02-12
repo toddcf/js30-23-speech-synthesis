@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Speech Synthesis</title>
+  <link href='https://fonts.googleapis.com/css?family=Pacifico' rel='stylesheet' type='text/css'>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div class="voiceinator">
+
+      <h1>The Voiceinator 5000</h1>
+
+      <select name="voice" id="voices">
+        <option value="">Select A Voice</option>
+      </select>
+
+      <!-- Do not rename "rate" -- it needs to line up with the utterance property -->
+      <label for="rate">Rate:</label>
+      <input name="rate" type="range" min="0" max="3" value="1" step="0.1">
+
+      <!-- Do not rename "pitch" -- it needs to line up with the utterance property -->
+      <label for="pitch">Pitch:</label>
+      <input name="pitch" type="range" min="0" max="2" step="0.1">
+
+      <!-- Do not rename "text" -- it needs to line up with the utterance property -->
+      <textarea name="text">Hello! I love JavaScript 👍</textarea>
+      <button id="stop">Stop!</button>
+      <button id="speak">Speak</button>
+
+    </div>
+
+<script>
+
+  const msg = new SpeechSynthesisUtterance();
+  let voices = [];
+  const voicesDropdown = document.querySelector('[name="voice"]');
+  const options = document.querySelectorAll('[type="range"], [name="text"]');
+  const speakButton = document.querySelector('#speak');
+  const stopButton = document.querySelector('#stop');
+
+  // Set whatever's in the textarea to the default:
+  msg.text = document.querySelector('[name="text"]').value;
+
+  function populateVoices() {
+    voices = this.getVoices();
+    // Loop over all voices, filter for English only, and set (and display) them as dropdown options:
+    voicesDropdown.innerHTML = voices
+      .filter(voice => voice.lang.includes('en'))
+      .map(voice => `<option value="${voice.name}">${voice.name} (Language: ${voice.lang})</option>`)
+      .join('');
+  }
+
+  function setVoice() {
+    // Find the voice that matches the selected value:
+    msg.voice = voices.find(voice => voice.name === this.value);
+
+    // When new voice is selected, restart the system:
+    toggle();
+  }
+
+  // Restart each time the voice is changed:
+  function toggle(startOver = true) {
+    // Stop whatever it's saying:
+    speechSynthesis.cancel();
+
+    // Have the option to override the restart -- only start over if it's set to the "true" default:
+    if(startOver) {
+      // Say the default text:
+      speechSynthesis.speak(msg);
+    }
+  }
+
+  function setOption() {
+    console.log(this.name, this.value);
+    msg[this.name] = this.value;
+
+    
+    toggle(startOver = false);
+  }
+
+  // Populate the different voices:
+  // Call SpeechSynthesis and pass it an utterance
+  // Need to use an event listener to let the page load before running populateVoices:
+  speechSynthesis.addEventListener('voiceschanged', populateVoices);
+
+  // Set voice when selected from dropdown:
+  voicesDropdown.addEventListener('change', setVoice);
+
+  // Slider Controls:
+  options.forEach(option => option.addEventListener('change', setOption));
+
+  // Buttons:
+  speakButton.addEventListener('click', toggle);
+  stopButton.addEventListener('click', () => toggle(false));
+
+</script>
+
+</body>
+</html>
