@@ -1,1 +1,1 @@
-# js30-23-speech-synthesis
+# JavaScript 30 #23: Speech Synthesis
