@@ -40,23 +40,23 @@
     options: document.querySelectorAll('[type="range"], [name="text"]'),
     speakButton: document.querySelector('#speak'),
     stopButton: document.querySelector('#stop'),
-    populateVoices: function() {
-      textReader.voices = this.getVoices();
+    populateVoices: (e) => {
+      textReader.voices = e.currentTarget.getVoices();
       // Loop over all voices, filter for English only, and set (and display) them as dropdown options:
       textReader.voicesDropdown.innerHTML = textReader.voices
         .filter(voice => voice.lang.includes('en'))
         .map(voice => `<option value="${voice.name}">${voice.name} (Language: ${voice.lang})</option>`)
         .join('');
     },
-    setVoice: function() {
+    setVoice: (e) => {
       // Find the voice that matches the selected value:
-      textReader.msg.voice = textReader.voices.find(voice => voice.name === this.value);
+      textReader.msg.voice = textReader.voices.find(voice => voice.name === e.currentTarget.value);
 
       // When new voice is selected, restart the system:
       textReader.toggle();
     },
     // Restart each time the voice is changed:
-    toggle: function(startOver = true) {
+    toggle: (startOver = true) => {
       // Stop whatever it's saying:
       speechSynthesis.cancel();
 
@@ -66,11 +66,8 @@
         speechSynthesis.speak(textReader.msg);
       }
     },
-    setOption: function() {
-      console.log(this.name, this.value);
-      textReader.msg[this.name] = this.value;
-
-      
+    setOption: (e) => {
+      textReader.msg[e.currentTarget.name] = e.currentTarget.value;      
       textReader.toggle(startOver = false);
     },
     init: () => {
